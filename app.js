@@ -36,7 +36,8 @@ const upload = multer({ storage }).single('image');
 app.post("/create",upload,  createUser);
 app.get("/", getAllUser);
 app.delete("/delete/:id", deleteUser)
-app.put("/update/:id", updateUser);
+app.put("/update/:id", upload, updateUser);
+
 
 // ================================Port Listen For Server==================================
 app.listen(4006, () => {

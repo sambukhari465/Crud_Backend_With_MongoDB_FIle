@@ -56,11 +56,16 @@ exports.deleteUser = async (req, res) => {
 };
 
 // ==============================Updata User Data With Params===================================
-exports.updateUser = async(req, res) => {
-  const {id} = req.params
-  const { name,email,password,age } = req.body;
-  const findUser =await users.findByIdAndUpdate(id);
-  if (findUser) {
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, password, age } = req.body;
+    const findUser = await users.findById(id);
+
+    if (!findUser) {
+      return res.json({ error: "User not found" });
+    }
+
     if (name) {
       findUser.name = name;
     }
@@ -74,12 +79,20 @@ exports.updateUser = async(req, res) => {
       findUser.age = age;
     }
     if (req.file) {
+      if (findUser.image) {
+        const imagePath = path.join(__dirname, '..', 'images', path.basename(findUser.image));
+        fs.unlinkSync(imagePath);
+      }
+
       const filePath = `http://localhost:4006/data/${req.file.filename}`;
       findUser.image = filePath;
     }
-  }
 
-  await findUser.save()
-  res.send(findUser);
+    await findUser.save();
+    res.send(findUser);
+  } catch (error) {
+    console.log("server error", error);
+    return res.json({ error: "Internal server error" });
+  }
 };
 
