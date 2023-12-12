@@ -21,6 +21,9 @@ const user = new mongoose.Schema({
         type:"String",
         required:false
     },
+    ref_id:{
+      type:String,
+    }
 })
 const users = mongoose.model('user', user)
 module.exports = users;
