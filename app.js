@@ -40,29 +40,34 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage }).single("image");
 //===============================
-function verifyToken(req, res, next) {
-  console.log("i am inside of verify",req.headers.authorization)
-  const token = req.headers.authorization && req.headers.authorization.split(" ")[1];
+// function verifyToken(req, res, next) {
+//   // console.log("i am inside of verify",req.headers.authorization)
+//   const token = req.body.auth ;
+// // console.log("token working")
+//   if (!token) {
+//     console.log(token)
+//     return res.sendStatus(401)
+//   };
 
-  if (!token) return res.sendStatus(401);
-
-  jwt.verify(token, 'token', (err, decoded) => {
-    if (err) {
-      console.log("Token verification failed:", err);
-      return res.sendStatus(403);
-    }
-console.log("i am decode",decoded)
-    req.user = decoded; // Save decoded user information in the request object
-    next();
-  });
-}
+//   jwt.verify(token, 'token', (err, decoded) => {
+//     if (err) {
+//       console.log("Token verification failed:", err);
+//       return res.sendStatus(403);
+//     }
+// console.log("i am decode",decoded)
+//     req.user = decoded; // Save decoded user information in the request object
+//     next();
+//   });
+// }
 
 // User Routes
-app.post("/create", verifyToken, upload, createUser);
-app.get("/", verifyToken, getAllUser);
-app.delete("/delete/:id", verifyToken, deleteUser);
-app.put("/update/:id", verifyToken, upload, updateUser);
-// Signin Route
+app.post("/create",  upload, createUser);
+app.get("/",  getAllUser);
+app.delete("/delete/:id",  deleteUser);
+app.put("/update/:id", upload, updateUser);
+
+
+//===================================== Signup Route ====================================
 app.post('/signup', async (req, res) => {
   const { name, email, password, age } = req.body;
   
@@ -71,7 +76,6 @@ app.post('/signup', async (req, res) => {
     const existingUser = await Signup.findOne({ email });
 
     if (existingUser) {
-      console.log("i am the error")
       return res.send('user already exists');
     }
 
@@ -92,12 +96,12 @@ app.post('/signup', async (req, res) => {
     res.send('user already exist');
   }
 });
+
+//===================================== Signin Route ====================================
 app.post("/signin", async (req, res) => {
   const { email, password } = req.body;
-  // const user_id=req.body._id;
   try {
     const user = await Signup.findOne({ email });
-    // console.log(user._id,"user bydefault")
 
     if (!user || user.password !== password) {
       return res.status(404).json("user not found");

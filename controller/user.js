@@ -7,7 +7,6 @@
   // ====================================Create New User=====================================
   exports.createUser = async(req, res) => {
     try {
-      console.log(req.body.user,"i am refernce")
     const findUser = await users.findOne({email:req.body.email})
     if(findUser){
       return res.json('user already exist')
@@ -22,6 +21,7 @@
       image: filePath,
       ref_id:req.body.ref_id
     });
+    console.log(req.body.auth)
     await newUser.save();
     return res.json(newUser)
     } catch (error) {
