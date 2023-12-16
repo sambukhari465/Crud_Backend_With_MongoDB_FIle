@@ -2,15 +2,15 @@ const mongoose = require('mongoose')
 
 const user = new mongoose.Schema({
     name:{
-        type:"String",
+        type:String,
         required:true
     },
     email:{
-        type:"String",
+        type:String,
         required:true
     },
     password:{
-        type:"String",
+        type:String,
         required:true
     },
     age:{
@@ -18,11 +18,12 @@ const user = new mongoose.Schema({
         required:true
     },
     image:{
-        type:"String",
+        type:String,
         required:false
     },
-    ref_id:{
-      type:String,
+    signup: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'signups' 
     }
 })
 const users = mongoose.model('user', user)

@@ -19,7 +19,6 @@ const signupSchema = new mongoose.Schema({
     required: true,
   },
 });
-
 const Signup = mongoose.model('Signup', signupSchema);
 
 module.exports = Signup;

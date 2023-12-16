@@ -1,9 +1,57 @@
-  const express= require("express")
-  const app = express();
   const users = require('../models/user.model')
+  const Signup = require ("../models/signupModel")
+  const jwt = require('jsonwebtoken');
   const path = require("path");
   const fs =require("fs")
-  app.use("/data",express.static("/images"))
+  //===================================== Signup Route ====================================
+  exports.signupUser = async(req, res) => {
+  const { name, email, password, age } = req.body;
+  
+
+  try {
+    const existingUser = await Signup.findOne({ email });
+
+    if (existingUser) {
+      return res.send('user already exists');
+    }
+
+    const newUser = new Signup({
+      name,
+      email,
+      password,
+      age,
+    });
+
+    await newUser.save();
+    console.log(newUser)
+    res.json('user created successfully');
+  } catch (error) {
+    console.error(error);
+    console.log("notumar ")
+    res.send('user already exist');
+  }
+}
+  //===================================== Signin Route ====================================
+  exports.signinUser = async(req, res) =>{
+  const { email, password } = req.body;
+  try {
+    const user = await Signup.findOne({ email });
+
+    if (!user || user.password !== password) {
+      return res.status(404).json("user not found");
+    }
+    const token = jwt.sign({ userId: user._id, userEmail: user.email,ref_id:user._id }, 'token');
+
+    res.json({
+      id: user._id,
+      email: user.email,
+      token,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json("Internal Server Error");
+  }
+}
   // ====================================Create New User=====================================
   exports.createUser = async(req, res) => {
     try {
@@ -19,9 +67,9 @@
       password: req.body.password,
       age: req.body.age,
       image: filePath,
-      ref_id:req.body.ref_id
+      signup: req.user
     });
-    console.log(req.body.auth)
+    // console.log(req.body.auth)
     await newUser.save();
     return res.json(newUser)
     } catch (error) {
@@ -31,7 +79,9 @@
   };
   // ====================================Get All User Data=====================================
   exports.getAllUser = async(req, res) => {
-  const allUsers = await users.find()
+    // console.log(req.user);
+    let filter={signup:req.user}
+  const allUsers = await users.find(filter)
     return res.send(allUsers);
   };
 
